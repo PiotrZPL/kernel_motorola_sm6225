@@ -237,9 +237,7 @@ static void nvt_ts_early_suspend(struct early_suspend *h);
 static void nvt_ts_late_resume(struct early_suspend *h);
 #endif
 
-#ifdef NVT_CONFIG_PANEL_NOTIFICATIONS
-static int nvt_panel_notifier_callback(struct notifier_block *self, unsigned long event, void *data);
-#endif
+
 #endif //end version code >= 5.4.0
 #endif //end touchscreen_mmi
 
@@ -4190,36 +4188,7 @@ static int nvt_drm_notifier_callback(struct notifier_block *self, unsigned long 
 
 #else //vension code < 5.4.0
 #ifdef NVT_CONFIG_PANEL_NOTIFICATIONS
-static int nvt_panel_notifier_callback(struct notifier_block *self, unsigned long event, void *data)
-{
-	struct nvt_ts_data *ts =
-		container_of(self, struct nvt_ts_data, panel_notif);
 
-	switch (event) {
-	case PANEL_EVENT_PRE_DISPLAY_OFF:
-			NVT_LOG("event=%lu\n", event);
-			nvt_ts_suspend(&ts->client->dev);
-#ifdef NVT_SENSOR_EN
-			if (ts->should_enable_gesture) {
-				NVT_LOG("double tap gesture suspend\n");
-				touch_set_state(TOUCH_LOW_POWER_STATE, TOUCH_PANEL_IDX_PRIMARY);
-			} else {
-				touch_set_state(TOUCH_DEEP_SLEEP_STATE, TOUCH_PANEL_IDX_PRIMARY);
-			}
-#endif
-				break;
-
-	case PANEL_EVENT_DISPLAY_ON:
-			NVT_LOG("event=%lu\n", event);
-			nvt_ts_resume(&ts->client->dev);
-				break;
-	default:	/* use DEV_TS here to avoid unused variable */
-			NVT_LOG("%s: function not implemented event %lu\n", __func__, event);
-				break;
-	}
-
-	return 0;
-}
 #endif
 
 #if defined(CONFIG_FB)
